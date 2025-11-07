@@ -23,12 +23,46 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Events API (NestJS + PostgreSQL) for the React Native app in `events-front`.
+
+- Base URL: `http://localhost:3000`
+- Swagger docs: `http://localhost:3000/docs`
+- Resources implemented (CRUD):
+  - `GET/POST /locais`, `PUT/DELETE /locais/:id`
+  - `GET/POST /eventos`, `PUT/DELETE /eventos/:id`
+  - `GET/POST /organizadores`, `PUT/DELETE /organizadores/:id`
+  - `GET/POST /participantes`, `PUT/DELETE /participantes/:id`
+  - `GET/POST /ingressos`, `PUT/DELETE /ingressos/:id`
+
+Data persists to PostgreSQL (local). IDs are UUIDs. TypeORM `synchronize: true` auto-creates tables (dev only).
+
+## Prerequisites
+
+- Node.js >= 18
+- PostgreSQL >= 13 running locally
+- Database `events` created (or customize via `.env`)
 
 ## Project setup
 
 ```bash
 $ npm install
+```
+
+Create a `.env` file (see `.env.example`):
+
+```
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASS=postgres
+DB_NAME=events
+PORT=3000
+```
+
+Ensure your Postgres server is running and the database exists:
+
+```bash
+psql -U postgres -c "CREATE DATABASE events;"
 ```
 
 ## Compile and run the project
@@ -43,6 +77,31 @@ $ npm run start:dev
 # production mode
 $ npm run start:prod
 ```
+
+TypeORM will auto-create tables on first run (synchronize enabled). Check Swagger at http://localhost:3000/docs for interactive API testing.
+
+### Example payloads
+
+- Local
+  ```json
+  { "nome": "Auditório Central", "cidade": "Florianópolis", "bairro": "Centro", "endereco": "Av. Brasil, 100", "capacidade": 200 }
+  ```
+- Evento
+  ```json
+  { "nome": "Show X", "data": "20/11/2025", "duracao": "02:30", "localId": "<uuid-local>" }
+  ```
+- Organizador
+  ```json
+  { "nome": "Ana", "funcao": "producao", "email": "ana@mail.com", "telefone": "(48) 99999-9999", "eventoId": "<uuid-evento>" }
+  ```
+- Participante
+  ```json
+  { "nome": "João", "email": "joao@mail.com", "telefone": "(48) 98888-8888", "eventoId": "<uuid-evento>" }
+  ```
+- Ingresso
+  ```json
+  { "nome": "Inteira", "preco": 50, "quantidade": 100, "vendaAtiva": true, "eventoId": "<uuid-evento>" }
+  ```
 
 ## Run tests
 
