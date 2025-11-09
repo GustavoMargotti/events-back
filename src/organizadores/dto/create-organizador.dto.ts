@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsIn, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateOrganizadorDto {
   @IsString()
@@ -7,6 +7,9 @@ export class CreateOrganizadorDto {
 
   @IsString()
   @IsNotEmpty()
+  @IsIn(['coordenacao', 'producao', 'recepcao', 'somluz', 'seguranca'], {
+    message: 'Função deve ser uma das opções válidas: coordenacao, producao, recepcao, somluz, seguranca',
+  })
   funcao!: string;
 
   @IsEmail()

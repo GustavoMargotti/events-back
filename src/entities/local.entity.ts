@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Evento } from './evento.entity';
 
 @Entity('locais')
 export class LocalEntity {
@@ -20,6 +21,6 @@ export class LocalEntity {
   @Column({ type: 'int' })
   capacidade!: number;
 
-  @OneToMany('Evento', 'local')
-  eventos?: any[];
+  @OneToMany(() => Evento, (evento) => evento.local)
+  eventos?: Evento[];
 }

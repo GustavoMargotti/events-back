@@ -9,7 +9,15 @@ export class Ingresso {
   @Column({ type: 'varchar', length: 255 })
   nome!: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseFloat(value),
+    },
+  })
   preco!: number;
 
   @Column({ type: 'int' })

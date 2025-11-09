@@ -1,5 +1,8 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, JoinColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn } from 'typeorm';
 import { LocalEntity } from './local.entity';
+import { Ingresso } from './ingresso.entity';
+import { Organizador } from './organizador.entity';
+import { Participante } from './participante.entity';
 
 @Entity('eventos')
 export class Evento {
@@ -21,4 +24,13 @@ export class Evento {
   @ManyToOne(() => LocalEntity, (l) => l.eventos, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'localId' })
   local?: LocalEntity;
+
+  @OneToMany(() => Ingresso, (i) => i.evento)
+  ingressos?: Ingresso[];
+
+  @OneToMany(() => Organizador, (o) => o.evento)
+  organizadores?: Organizador[];
+
+  @OneToMany(() => Participante, (p) => p.evento)
+  participantes?: Participante[];
 }

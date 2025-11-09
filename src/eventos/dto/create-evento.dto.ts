@@ -7,6 +7,7 @@ export class CreateEventoDto {
 
   @IsString()
   @IsNotEmpty()
+  @Matches(/^\d{2}\/\d{2}\/\d{4}$/, { message: 'Data deve estar no formato DD/MM/AAAA' })
   data!: string; // DD/MM/AAAA
 
   @IsString()
