@@ -1,55 +1,34 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Events API (Backend)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST para gestão de eventos, locais, ingressos, organizadores e participantes.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🧱 Modelo de Dados (simplificado)
+- Evento: { id, nome, data (DD/MM/AAAA), duracao (hh:mm), localId }
+- Local: { id, nome, cidade, bairro, endereco, capacidade }
+- Ingresso: { id, nome, preco (number), quantidade, vendaAtiva, eventoId }
+- Organizador: { id, nome, funcao, email, telefone, eventoId }
+- Participante: { id, nome, email, telefone, eventoId }
 
-## Description
+## 🧠 Regras de Negócio (15)
+1. Evento não pode ser criado/editado com data no passado  
+2. Duração mínima 00:30 e máxima 23:59  
+3. Um local não pode ter dois eventos na mesma data  
+4. Soma das quantidades de ingressos de um evento não pode exceder a capacidade do local  
+5. Nome de tipo de ingresso deve ser único por evento  
+6. Não é permitido excluir o último tipo de ingresso de um evento  
+7. Função de organizador única por evento (sem duplicar mesma função)  
+8. Email de organizador único por evento  
+9. Não excluir o último organizador do evento  
+10. Participante: email único por evento  
+11. Total de participantes não pode exceder capacidade do local  
+12. Local não pode ser excluído se houver eventos futuros vinculados  
+13. Preço de ingresso deve ser > 0  
+14. Campos de endereço (cidade, bairro, endereço) não podem ser apenas espaços  
+15. Nome de evento deve ser único dentro do mesmo local na mesma data  
 
-Events API (NestJS + PostgreSQL) for the React Native app in `events-front`.
+Todas retornam HTTP 400 (`BadRequestException`) ou 404 (`NotFoundException`) conforme o caso.
 
-- Base URL: `http://localhost:3000`
-- Swagger docs: `http://localhost:3000/docs`
-- Resources implemented (CRUD):
-  - `GET/POST /locais`, `PUT/DELETE /locais/:id`
-  - `GET/POST /eventos`, `PUT/DELETE /eventos/:id`
-  - `GET/POST /organizadores`, `PUT/DELETE /organizadores/:id`
-  - `GET/POST /participantes`, `PUT/DELETE /participantes/:id`
-  - `GET/POST /ingressos`, `PUT/DELETE /ingressos/:id`
-
-Data persists to PostgreSQL (local). IDs are UUIDs. TypeORM `synchronize: true` auto-creates tables (dev only).
-
-## Prerequisites
-
-- Node.js >= 18
-- PostgreSQL >= 13 running locally
-- Database `events` created (or customize via `.env`)
-
-## Project setup
-
-```bash
-$ npm install
-```
-
-Create a `.env` file (see `.env.example`):
-
+## 🗄️ Variáveis de Ambiente (.env)
 ```
 DB_HOST=localhost
 DB_PORT=5432
@@ -58,100 +37,3 @@ DB_PASS=postgres
 DB_NAME=events
 PORT=3000
 ```
-
-Ensure your Postgres server is running and the database exists:
-
-```bash
-psql -U postgres -c "CREATE DATABASE events;"
-```
-
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-TypeORM will auto-create tables on first run (synchronize enabled). Check Swagger at http://localhost:3000/docs for interactive API testing.
-
-### Example payloads
-
-- Local
-  ```json
-  { "nome": "Auditório Central", "cidade": "Florianópolis", "bairro": "Centro", "endereco": "Av. Brasil, 100", "capacidade": 200 }
-  ```
-- Evento
-  ```json
-  { "nome": "Show X", "data": "20/11/2025", "duracao": "02:30", "localId": "<uuid-local>" }
-  ```
-- Organizador
-  ```json
-  { "nome": "Ana", "funcao": "producao", "email": "ana@mail.com", "telefone": "(48) 99999-9999", "eventoId": "<uuid-evento>" }
-  ```
-- Participante
-  ```json
-  { "nome": "João", "email": "joao@mail.com", "telefone": "(48) 98888-8888", "eventoId": "<uuid-evento>" }
-  ```
-- Ingresso
-  ```json
-  { "nome": "Inteira", "preco": 50, "quantidade": 100, "vendaAtiva": true, "eventoId": "<uuid-evento>" }
-  ```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
